@@ -51,26 +51,25 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
                 try:
                     videoLink = re.search(r'(?<=file":")[^"]*(?=")', iframeSite.read().decode('utf-8')).group()
 
-                    f = open('%s.%s' % (videoName, videoLink.split('.')[-1]), 'wb')
-
                     with urllib.request.urlopen(urllib.request.Request(videoLink, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
-                        videoSize = int(video.getheader('content-length'))
-                        videoDownloadedSize = 0
+                        with open('%s.%s' % (videoName, videoLink.split('.')[-1]), 'wb') as f:
+                            videoSize = int(video.getheader('content-length'))
+                            videoDownloadedSize = 0
 
-                        while videoDownloadedSize < videoSize:
-                            f.write(video.read(VIDEO_READ_SIZE))
+                            while videoDownloadedSize < videoSize:
+                                f.write(video.read(VIDEO_READ_SIZE))
 
-                            videoDownloadedSize += VIDEO_READ_SIZE
+                                videoDownloadedSize += VIDEO_READ_SIZE
 
-                            if videoDownloadedSize > videoSize:
-                                videoDownloadedSize = videoSize
+                                if videoDownloadedSize > videoSize:
+                                    videoDownloadedSize = videoSize
 
-                            print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
-                    
-                    f.close()
+                                print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                        
                     print('')
 
                     isVideoDownloaded = True
+
                 except:
                     pass
 

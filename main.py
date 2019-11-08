@@ -39,7 +39,7 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
 
     animeVideoListDivSoup = BeautifulSoup(str(soup.find('div', {'class': 'ani_video_list'})), 'html.parser')
 
-    for i in map(str, sorted(animeVideoListDivSoup.find_all('a'))):
+    for i in list(map(str, animeVideoListDivSoup.find_all('a')))[::-1]:
         videoName = re.search(r'(?<=<div class="subject">).*(?=</div>)', i).group()
         
         with urllib.request.urlopen(urllib.request.Request('%s' % (re.search(r'(?<=<a href=").*(?=">)', i).group()), headers={'User-Agent': 'Mozilla/5.0'})) as videoSite:

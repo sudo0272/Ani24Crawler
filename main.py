@@ -45,23 +45,40 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
             iframeLink = ''.join(re.findall(r'(?<=ifr_adr \+= ")[^"]*(?=")', videoSite.read().decode('utf-8')))
 
             with urllib.request.urlopen(urllib.request.Request('https://%s' % (iframeLink), headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'a'})) as iframeSite:
-                videoLink = re.search(r'(?<=file":")[^"]*(?=")', iframeSite.read().decode('utf-8')).group()
+                isVideoDownloaded = False
 
-                f = open('%s.%s' % (videoName, videoLink.split('.')[-1]), 'wb')
+                # jwplayer
+                try:
+                    videoLink = re.search(r'(?<=file":")[^"]*(?=")', iframeSite.read().decode('utf-8')).group()
 
-                with urllib.request.urlopen(urllib.request.Request(videoLink, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
-                    videoSize = int(video.getheader('content-length'))
-                    videoDownloadedSize = 0
+                    f = open('%s.%s' % (videoName, videoLink.split('.')[-1]), 'wb')
 
-                    while videoDownloadedSize < videoSize:
-                        f.write(video.read(VIDEO_READ_SIZE))
+                    with urllib.request.urlopen(urllib.request.Request(videoLink, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
+                        videoSize = int(video.getheader('content-length'))
+                        videoDownloadedSize = 0
 
-                        videoDownloadedSize += VIDEO_READ_SIZE
+                        while videoDownloadedSize < videoSize:
+                            f.write(video.read(VIDEO_READ_SIZE))
 
-                        if videoDownloadedSize > videoSize:
-                            videoDownloadedSize = videoSize
+                            videoDownloadedSize += VIDEO_READ_SIZE
 
-                        print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
-                
-                f.close()
-                print('')
+                            if videoDownloadedSize > videoSize:
+                                videoDownloadedSize = videoSize
+
+                            print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                    
+                    f.close()
+                    print('')
+
+                    isVideoDownloaded = True
+                except:
+                    pass
+
+                #TODO openload
+                #TODO dailymotion
+                #TODO rapidvideo
+                #TODO stremango
+                #TODO mp4upload
+
+                if not isVideoDownloaded:
+                    print('%s가 다운로드되지 못했습니다')

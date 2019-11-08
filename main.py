@@ -10,7 +10,6 @@ VIDEO_READ_SIZE = 2048
 
 searchKeyword = input('검색어: ')
 
-print('%s/ani/search.php?%s' % (ANI24_URL, urllib.parse.urlencode({'query': searchKeyword})))
 with urllib.request.urlopen(urllib.request.Request('%s/ani/search.php?%s' % (ANI24_URL, urllib.parse.urlencode({'query': searchKeyword})), headers={'User-Agent': 'Mozilla/5.0'})) as response:
     html = response.read()
     soup = BeautifulSoup(html, 'html.parser')
@@ -62,7 +61,7 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
                         if videoDownloadedSize > videoSize:
                             videoDownloadedSize = videoSize
 
-                        print('%s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                        print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
                 
                 f.close()
                 print('')

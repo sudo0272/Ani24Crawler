@@ -12,30 +12,6 @@ VIDEO_READ_SIZE = 2048
 def isNumber(n):
     return bool(re.match(r'^\d+$', n))
 
-def downloadVideo(name, path, link):
-    try:
-        with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
-            with open('%s/%s.%s' % (path, name, link.split('.')[-1]), 'wb') as f:
-                videoSize = int(video.getheader('content-length'))
-                videoDownloadedSize = 0
-
-                while videoDownloadedSize < videoSize:
-                    f.write(video.read(VIDEO_READ_SIZE))
-
-                    videoDownloadedSize += VIDEO_READ_SIZE
-
-                    if videoDownloadedSize > videoSize:
-                        videoDownloadedSize = videoSize
-
-                    print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (name, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
-            
-        print('')
-
-        return True
-
-    except:
-        return False
-
 downloadPath = input('저장 위치: ')
 if not os.path.exists(downloadPath):
     os.makedirs(downloadPath)
@@ -112,16 +88,54 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
                 # jwplayer
                 if not isVideoDownloaded:
                     try:
-                        isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group(), downloadPath)
-                    
+                        link = re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group()
+
+                        with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
+                            with open('%s/%s.%s' % (downloadPath, videoName, link.split('.')[-1]), 'wb') as f:
+                                videoSize = int(video.getheader('content-length'))
+                                videoDownloadedSize = 0
+
+                                while videoDownloadedSize < videoSize:
+                                    f.write(video.read(VIDEO_READ_SIZE))
+
+                                    videoDownloadedSize += VIDEO_READ_SIZE
+
+                                    if videoDownloadedSize > videoSize:
+                                        videoDownloadedSize = videoSize
+
+                                    print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                            
+                        print('')
+
+                        isVideoDownloaded = True
+
                     except:
                         pass
 
                 # video player
                 if not isVideoDownloaded:
                     try:
-                        isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
-                    
+                        link = re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group()
+
+                        with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
+                            with open('%s/%s.%s' % (downloadPath, videoName, link.split('.')[-1]), 'wb') as f:
+                                videoSize = int(video.getheader('content-length'))
+                                videoDownloadedSize = 0
+
+                                while videoDownloadedSize < videoSize:
+                                    f.write(video.read(VIDEO_READ_SIZE))
+
+                                    videoDownloadedSize += VIDEO_READ_SIZE
+
+                                    if videoDownloadedSize > videoSize:
+                                        videoDownloadedSize = videoSize
+
+                                    print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                            
+                        print('')
+
+                        isVideoDownloaded = True
+
                     except:
                         pass
 
@@ -157,10 +171,29 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
                 # stremango
                 if not isVideoDownloaded:
                     try:
-                        isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
+                        link = re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group()
+
+                        with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
+                            with open('%s/%s.%s' % (downloadPath, videoName, link.split('.')[-1]), 'wb') as f:
+                                videoSize = int(video.getheader('content-length'))
+                                videoDownloadedSize = 0
+
+                                while videoDownloadedSize < videoSize:
+                                    f.write(video.read(VIDEO_READ_SIZE))
+
+                                    videoDownloadedSize += VIDEO_READ_SIZE
+
+                                    if videoDownloadedSize > videoSize:
+                                        videoDownloadedSize = videoSize
+
+                                    print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                            
+                        print('')
+
+                        isVideoDownloaded = True
 
                     except:
                         pass
                     
                 if not isVideoDownloaded:
-                    print('%s가 다운로드되지 못했습니다' % videoName)
+                    print(' %s가 다운로드되지 못했습니다' % videoName)

@@ -3,6 +3,7 @@ import urllib
 import re
 import time
 import ssl
+import os
 
 ANI24_URL = 'https://ani24zo.com'
 
@@ -11,11 +12,11 @@ VIDEO_READ_SIZE = 2048
 def isNumber(n):
     return bool(re.match(r'^\d+$', n))
 
-def downloadVideo(name, link):
+def downloadVideo(name, path, link):
     try:
 
         with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
-            with open('%s.%s' % (name, link.split('.')[-1]), 'wb') as f:
+            with open('%s/%s.%s' % (path, name, link.split('.')[-1]), 'wb') as f:
                 videoSize = int(video.getheader('content-length'))
                 videoDownloadedSize = 0
 
@@ -35,6 +36,9 @@ def downloadVideo(name, link):
 
     except:
         return False
+
+downloadPath = input('저장 위치: ')
+os.makedirs(downloadPath)
 
 searchKeyword = input('검색어: ')
 
@@ -107,17 +111,17 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
 
                 # jwplayer
                 if not isVideoDownloaded:
-                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group())
+                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group(), downloadPath)
                 
                 #TODO video player
                 if not isVideoDownloaded:
-                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group())
+                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
 
                 #TODO openload
                 #TODO dailymotion
                 #TODO stremango
                 if not isVideoDownloaded:
-                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group())
+                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
 
                 #TODO mp4upload
 

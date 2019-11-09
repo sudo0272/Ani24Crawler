@@ -14,7 +14,6 @@ def isNumber(n):
 
 def downloadVideo(name, path, link):
     try:
-
         with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
             with open('%s/%s.%s' % (path, name, link.split('.')[-1]), 'wb') as f:
                 videoSize = int(video.getheader('content-length'))
@@ -38,7 +37,8 @@ def downloadVideo(name, path, link):
         return False
 
 downloadPath = input('저장 위치: ')
-os.makedirs(downloadPath)
+if not os.path.exists(downloadPath):
+    os.makedirs(downloadPath)
 
 searchKeyword = input('검색어: ')
 
@@ -111,19 +111,56 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
 
                 # jwplayer
                 if not isVideoDownloaded:
-                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group(), downloadPath)
-                
-                #TODO video player
+                    try:
+                        isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group(), downloadPath)
+                    
+                    except:
+                        pass
+
+                # video player
                 if not isVideoDownloaded:
-                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
+                    try:
+                        isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
+                    
+                    except:
+                        pass
+
+                # mp4upload
+                if not isVideoDownloaded:
+                    try:
+                        link = re.search(r'(?<=title="mp4upload 플레이어" data-link=")[^"]*(?=")', iframeHtml).group().replace('embed-', '')
+                        with urllib.request.urlopen(urllib.request.Request(link, data=urllib.parse.urlencode({'op': 'download2', 'id': link.split('/')[-1].replace('.html', '')}).encode('utf-8'), method='POST'), context=ssl.SSLContext()) as video:
+                            with open('%s/%s.mp4' % (downloadPath, videoName), 'wb') as f:
+                                videoSize = int(video.getheader('content-length'))
+                                videoDownloadedSize = 0
+
+                                while videoDownloadedSize < videoSize:
+                                    f.write(video.read(VIDEO_READ_SIZE))
+
+                                    videoDownloadedSize += VIDEO_READ_SIZE
+
+                                    if videoDownloadedSize > videoSize:
+                                        videoDownloadedSize = videoSize
+
+                                    print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+                            
+                        print('')
+
+                        isVideoDownloaded = True
+
+                    except:
+                        pass
+
 
                 #TODO openload
                 #TODO dailymotion
-                #TODO stremango
+                # stremango
                 if not isVideoDownloaded:
-                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
+                    try:
+                        isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group(), downloadPath)
 
-                #TODO mp4upload
-
+                    except:
+                        pass
+                    
                 if not isVideoDownloaded:
                     print('%s가 다운로드되지 못했습니다' % videoName)

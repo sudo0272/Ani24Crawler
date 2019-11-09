@@ -116,7 +116,10 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
                 #TODO openload
                 #TODO dailymotion
                 #TODO stremango
+                if not isVideoDownloaded:
+                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="streamango 플레이어" data-link=")[^"]*(?=")', iframeHtml).group())
+
                 #TODO mp4upload
 
                 if not isVideoDownloaded:
-                    print('%s가 다운로드되지 못했습니다')
+                    print('%s가 다운로드되지 못했습니다' % videoName)

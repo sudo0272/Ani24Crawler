@@ -11,6 +11,31 @@ VIDEO_READ_SIZE = 2048
 def isNumber(n):
     return bool(re.match(r'^\d+$', n))
 
+def downloadVideo(name, link):
+    try:
+
+        with urllib.request.urlopen(urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
+            with open('%s.%s' % (name, link.split('.')[-1]), 'wb') as f:
+                videoSize = int(video.getheader('content-length'))
+                videoDownloadedSize = 0
+
+                while videoDownloadedSize < videoSize:
+                    f.write(video.read(VIDEO_READ_SIZE))
+
+                    videoDownloadedSize += VIDEO_READ_SIZE
+
+                    if videoDownloadedSize > videoSize:
+                        videoDownloadedSize = videoSize
+
+                    print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (name, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
+            
+        print('')
+
+        return True
+
+    except:
+        return False
+
 searchKeyword = input('검색어: ')
 
 with urllib.request.urlopen(urllib.request.Request('%s/ani/search.php?%s' % (ANI24_URL, urllib.parse.urlencode({'query': searchKeyword})), headers={'User-Agent': 'Mozilla/5.0'})) as response:
@@ -76,33 +101,13 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
             iframeLink = ''.join(re.findall(r'(?<=ifr_adr \+= ")[^"]*(?=")', videoSite.read().decode('utf-8')))
 
             with urllib.request.urlopen(urllib.request.Request('https://%s' % (iframeLink), headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'a'})) as iframeSite:
+                iframeHtml = iframeSite.read().decode('utf-8')
+                
                 isVideoDownloaded = False
 
                 # jwplayer
-                try:
-                    videoLink = re.search(r'(?<=file":")[^"]*(?=")', iframeSite.read().decode('utf-8')).group()
-
-                    with urllib.request.urlopen(urllib.request.Request(videoLink, headers={'User-Agent': 'Mozilla/5.0'}), context=ssl.SSLContext()) as video:
-                        with open('%s.%s' % (videoName, videoLink.split('.')[-1]), 'wb') as f:
-                            videoSize = int(video.getheader('content-length'))
-                            videoDownloadedSize = 0
-
-                            while videoDownloadedSize < videoSize:
-                                f.write(video.read(VIDEO_READ_SIZE))
-
-                                videoDownloadedSize += VIDEO_READ_SIZE
-
-                                if videoDownloadedSize > videoSize:
-                                    videoDownloadedSize = videoSize
-
-                                print(' %s 다운로드중... %2d%% [%d/%d bytes]' % (videoName, videoDownloadedSize * 100 // videoSize, videoDownloadedSize, videoSize), end='\r')
-                        
-                    print('')
-
-                    isVideoDownloaded = True
-
-                except:
-                    pass
+                if not isVideoDownloaded:
+                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group())
                 
                 #TODO video player
                 #TODO openload

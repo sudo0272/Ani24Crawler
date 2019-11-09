@@ -115,7 +115,6 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
 
                 #TODO openload
                 #TODO dailymotion
-                #TODO rapidvideo
                 #TODO stremango
                 #TODO mp4upload
 

@@ -103,7 +103,8 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
 
                 except:
                     pass
-
+                
+                #TODO video player
                 #TODO openload
                 #TODO dailymotion
                 #TODO rapidvideo

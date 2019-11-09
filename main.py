@@ -110,6 +110,9 @@ with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeLis
                     isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=file":")[^"]*(?=")', iframeHtml).group())
                 
                 #TODO video player
+                if not isVideoDownloaded:
+                    isVideoDownloaded = downloadVideo(videoName, re.search(r'(?<=title="video 플레이어" data-link=")[^"]*(?=")', iframeHtml).group())
+
                 #TODO openload
                 #TODO dailymotion
                 #TODO rapidvideo

@@ -8,6 +8,9 @@ ANI24_URL = 'https://ani24zo.com'
 
 VIDEO_READ_SIZE = 2048
 
+def isNumber(n):
+    return bool(re.match(r'^\d+$'))
+
 searchKeyword = input('검색어: ')
 
 with urllib.request.urlopen(urllib.request.Request('%s/ani/search.php?%s' % (ANI24_URL, urllib.parse.urlencode({'query': searchKeyword})), headers={'User-Agent': 'Mozilla/5.0'})) as response:
@@ -25,12 +28,12 @@ with urllib.request.urlopen(urllib.request.Request('%s/ani/search.php?%s' % (ANI
     
     animeTargetIndex = None
     while True:
-        try:
-            animeTargetIndex = int(input(' > ')) - 1
-            
+        animeTargetIndex = input()
+
+        if isNumber(animeTargetIndex) and 1 <= int(animeTargetIndex) <= len(animeList):
+            animeTargetIndex = int(animeTargetIndex) - 1
+
             break
-        except:
-            pass
 
 with urllib.request.urlopen(urllib.request.Request('%s%s' % (ANI24_URL, animeList[animeTargetIndex][1]), headers={'User-Agent': 'Mozilla/5.0'})) as response:
     html = response.read()
